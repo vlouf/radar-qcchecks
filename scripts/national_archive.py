@@ -197,13 +197,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=parser_description)
     parser.add_argument("-r", "--rid", dest="rid", type=int, required=True, help="Radar ID number.")
     parser.add_argument(
-        "-o", "--output", dest="output", default="/scratch/kl02/vhl548/qcchecks/", type=str, help="Output directory for csv files.",
+        "-o",
+        "--output",
+        dest="output",
+        default="/scratch/kl02/vhl548/qcchecks/",
+        type=str,
+        help="Output directory for csv files.",
     )
     parser.add_argument(
-        "-s", "--start-date", dest="start_date", default=None, type=str, help="Start date for radar processing.", required=True,
+        "-s",
+        "--start-date",
+        dest="start_date",
+        default=None,
+        type=str,
+        help="Start date for radar processing.",
+        required=True,
     )
     parser.add_argument(
-        "-e", "--end-date", dest="end_date", default=None, type=str, help="End date for radar processing.", required=True,
+        "-e",
+        "--end-date",
+        dest="end_date",
+        default=None,
+        type=str,
+        help="End date for radar processing.",
+        required=True,
     )
 
     args = parser.parse_args()
