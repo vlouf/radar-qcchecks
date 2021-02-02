@@ -10,7 +10,7 @@ https://doi.org/10.1175/2010JTECHA1462.1
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 02/02/2021
+@date: 03/02/2021
 
 .. autosummary::
     :toctree: generated/
@@ -161,6 +161,16 @@ def qccheck_radar_odim(
     ===========
     infile: str
         Input radar file in ODIM H5 format.
+    dbz_name: str
+        Reflectivity field name.
+    zdr_name: str
+        ZDR field name.
+    rhohv_name: str
+        RHOHV field name.
+    phidp_name: str
+        PHIDP field name.
+    kdp_name: str
+        KDP field name.
 
     Returns:
     ========
