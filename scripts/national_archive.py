@@ -1,7 +1,6 @@
 import gc
 import os
 import sys
-import glob
 import time
 import zipfile
 import argparse
@@ -195,30 +194,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=parser_description)
     parser.add_argument("-r", "--rid", dest="rid", type=int, required=True, help="Radar ID number.")
     parser.add_argument(
-        "-o",
-        "--output",
-        dest="output",
-        default="/scratch/kl02/vhl548/qcchecks/",
-        type=str,
-        help="Output directory",
+        "-o", "--output", dest="output", default="/scratch/kl02/vhl548/qcchecks/", type=str, help="Output directory",
     )
     parser.add_argument(
-        "-s",
-        "--start-date",
-        dest="start_date",
-        default=None,
-        type=str,
-        help="Starting date.",
-        required=True,
+        "-s", "--start-date", dest="start_date", default=None, type=str, help="Starting date.", required=True,
     )
     parser.add_argument(
-        "-e",
-        "--end-date",
-        dest="end_date",
-        default=None,
-        type=str,
-        help="Ending date.",
-        required=True,
+        "-e", "--end-date", dest="end_date", default=None, type=str, help="Ending date.", required=True,
     )
 
     args = parser.parse_args()
@@ -248,4 +230,3 @@ if __name__ == "__main__":
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         main(start, end)
-
