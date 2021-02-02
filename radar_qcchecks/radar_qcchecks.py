@@ -1,3 +1,25 @@
+"""
+Quality control check of dual-polarization variables following the paper:
+
+Marks, D. A., Wolff, D. B., Carey, L. D., Tokay, A., Systems, S., & County, B. 
+(2011). Quality control and calibration of the dual-polarization radar at 
+Kwajalein, RMI. Journal of Atmospheric and Oceanic Technology, 28(2), 181–196. 
+https://doi.org/10.1175/2010JTECHA1462.1
+
+@title: radar_qcchecks
+@author: Valentin Louf <valentin.louf@bom.gov.au>
+@institutions: Bureau of Meteorology
+@creation: 02/02/2021
+@date: 02/02/2021
+
+.. autosummary::
+    :toctree: generated/
+
+    smooth_and_trim
+    det_sys_phase
+    get_statistics
+    qccheck_radar_odim
+"""
 import warnings
 
 import pyodim
