@@ -1,9 +1,9 @@
 """
 Quality control check of dual-polarization variables following the paper:
 
-Marks, D. A., Wolff, D. B., Carey, L. D., Tokay, A., Systems, S., & County, B. 
-(2011). Quality control and calibration of the dual-polarization radar at 
-Kwajalein, RMI. Journal of Atmospheric and Oceanic Technology, 28(2), 181–196. 
+Marks, D. A., Wolff, D. B., Carey, L. D., Tokay, A., Systems, S., & County, B.
+(2011). Quality control and calibration of the dual-polarization radar at
+Kwajalein, RMI. Journal of Atmospheric and Oceanic Technology, 28(2), 181–196.
 https://doi.org/10.1175/2010JTECHA1462.1
 
 @title: radar_qcchecks
@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 
-def smooth_and_trim(x, window_len: int = 11, window: str = 'hanning'):
+def smooth_and_trim(x, window_len: int = 11, window: str = "hanning"):
     """
     Smooth data using a window with requested size.
     This method is based on the convolution of a scaled window with the signal.
@@ -55,23 +55,22 @@ def smooth_and_trim(x, window_len: int = 11, window: str = 'hanning'):
         raise ValueError("Input vector needs to be bigger than window size.")
     if window_len < 3:
         return x
-    valid_windows = ['flat', 'hanning', 'hamming', 'bartlett', 'blackman',
-                     'sg_smooth']
+    valid_windows = ["flat", "hanning", "hamming", "bartlett", "blackman", "sg_smooth"]
     if window not in valid_windows:
-        raise ValueError("Window is on of " + ' '.join(valid_windows))
+        raise ValueError("Window is on of " + " ".join(valid_windows))
 
-    s = np.r_[x[window_len - 1:0:-1], x, x[-1:-window_len:-1]]
+    s = np.r_[x[window_len - 1 : 0 : -1], x, x[-1:-window_len:-1]]
 
-    if window == 'flat':  # moving average
-        w = np.ones(int(window_len), 'd')
-    elif window == 'sg_smooth':
-        w = np.array([0.1, .25, .3, .25, .1])
+    if window == "flat":  # moving average
+        w = np.ones(int(window_len), "d")
+    elif window == "sg_smooth":
+        w = np.array([0.1, 0.25, 0.3, 0.25, 0.1])
     else:
-        w = eval('np.' + window + '(window_len)')
+        w = eval("np." + window + "(window_len)")
 
-    y = np.convolve(w / w.sum(), s, mode='valid')
+    y = np.convolve(w / w.sum(), s, mode="valid")
 
-    return y[int(window_len / 2):len(x) + int(window_len / 2)]
+    return y[int(window_len / 2) : len(x) + int(window_len / 2)]
 
 
 def det_sys_phase(rhv, phidp, rhv_lev: float = 0.6):
@@ -115,6 +114,7 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     statistics: dict
         DP quality checks statistics for given scan.
     """
+
     def zdr_stats(zdrp):
         szdr = zdrp.std()
         aad = np.sum(np.abs(zdrp - zdrp.mean())) / len(zdrp)
@@ -140,7 +140,7 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "PHIDP_med": np.nanmedian(sigma_phi),
         "PHIDP_std": np.nanstd(sigma_phi),
         "N_kdp_sample": (~np.isnan(sigma_phi)).sum(),
-        "SIGMA_kdp": sig_kdp
+        "SIGMA_kdp": sig_kdp,
     }
 
     return statistics
@@ -183,10 +183,7 @@ def qccheck_radar_odim(infile: str):
             phasemin = np.median(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
-        pos_lowcut = (
-            ~np.isnan(dbzh) &
-            (dbzh >= 20) & (dbzh <= 28)
-        )
+        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28)
 
         if np.sum(pos_lowcut) < 100:
             return None
