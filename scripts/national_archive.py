@@ -1,3 +1,24 @@
+"""
+GADI driver script for the Quality control check of dual-polarization variables.
+
+@title: radar_qcchecks
+@author: Valentin Louf <valentin.louf@bom.gov.au>
+@institutions: Bureau of Meteorology
+@creation: 02/02/2021
+@date: 02/02/2021
+
+.. autosummary::
+    :toctree: generated/
+
+    check_rid
+    extract_zip
+    get_radar_archive_file
+    load_national_archive_info
+    remove
+    buffer
+    process_quality_control
+    main
+"""
 import gc
 import os
 import sys
@@ -163,7 +184,7 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     return None
 
 
-def main(start_date, end_date):
+def main(start_date, end_date) -> None:
     tick = time.time()
     date_range = pd.date_range(start_date, end_date)
     for date in date_range:
