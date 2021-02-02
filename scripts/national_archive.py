@@ -13,7 +13,6 @@ GADI driver script for the Quality control check of dual-polarization variables.
     check_rid
     extract_zip
     get_radar_archive_file
-    load_national_archive_info
     remove
     buffer
     process_quality_control
@@ -92,22 +91,6 @@ def get_radar_archive_file(date, rid: int) -> str:
         return None
 
     return file
-
-
-def load_national_archive_info():
-    """
-    Load Australian national archive informations as a Dataframe.
-
-    Returns:
-    ========
-    df: pandas.Dataframe
-        Dataframe containing general information about the Australian radar
-        Network (lat/lon, site name, frequency band and bandwith).
-    """
-    file = "~/radar_site_list.csv"
-    df = pd.read_csv(file).drop_duplicates("id", keep="last").reset_index()
-
-    return df
 
 
 def remove(flist: list) -> None:
