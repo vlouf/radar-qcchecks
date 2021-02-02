@@ -175,6 +175,7 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     finally:
         remove(flist)
 
+    gc.collect()
     return None
 
 
@@ -184,7 +185,7 @@ def main(start_date, end_date):
     for date in date_range:
         process_quality_control(RID, date, OUTPATH)
     tock = time.time()
-    print(crayons.magenta(f"Process finished in {tock - tick:0.2}s."))
+    print(crayons.magenta(f"Process finished in {tock - tick:0.4}s."))
 
     return None
 
