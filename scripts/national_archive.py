@@ -121,7 +121,7 @@ def buffer(infile: str):
         Pandas dataframe with the results from the solar calibration code.
     """
     try:
-        rslt = radar_qcchecks.read_data(infile)
+        rslt = radar_qcchecks.qccheck_radar_odim(infile)
     except Exception:
         print(f"Problem with file {infile}.")
         traceback.print_exc()

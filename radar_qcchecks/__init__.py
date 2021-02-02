@@ -1,1 +1,1 @@
-from .radar_qcchecks import read_data
+from .radar_qcchecks import qccheck_radar_odim
