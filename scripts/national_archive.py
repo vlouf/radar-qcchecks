@@ -9,9 +9,6 @@ import datetime
 import warnings
 import traceback
 
-from typing import List
-
-import pyodim
 import crayons
 import numpy as np
 import pandas as pd
@@ -143,7 +140,7 @@ def buffer(infile: str):
     return rslt
 
 
-def process_quality_control(rid: int, date: pd.Timestamp, outpath: str = "/scratch/kl02/vhl548/qcchecks/") -> None:
+def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     fname = f"{rid}_stats_" + date.strftime("%Y%m%d") + ".csv"
     fname = os.path.join(outpath, fname)
     if os.path.isfile(fname):
@@ -179,6 +176,16 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str = "/scrat
     return None
 
 
+def main(start_date, end_date):
+    tick = time.time()
+    date_range = pd.date_range(start_date, end_date)
+    for date in date_range:
+        process_quality_control(RID, date, OUTPATH)
+    tock = time.time()
+    print(crayons.magenta(f"Process finished in {tock - tick:0.2}s."))
+
+    return None
+
 
 if __name__ == "__main__":
     parser_description = "Solar calibration of radar in the National radar archive."
@@ -188,7 +195,7 @@ if __name__ == "__main__":
         "-o",
         "--output",
         dest="output",
-        default="/scratch/kl02/vhl548/s3car-server/solar/",
+        default="/scratch/kl02/vhl548/qcchecks/",
         type=str,
         help="Output directory",
     )
@@ -227,18 +234,15 @@ if __name__ == "__main__":
         end = datetime.datetime.strptime(END_DATE, "%Y%m%d")
         if start > end:
             parser.error("End date older than start date.")
-        date_range = [start + datetime.timedelta(days=x) for x in range(0, (end - start).days + 1,)]
     except ValueError:
         parser.error("Invalid dates.")
         sys.exit()
 
-    print(crayons.green(f"Processing sun calibration for radar {RID}."))
+    print(crayons.green(f"Processing QC checks for radar {RID}."))
     print(crayons.green(f"Between {START_DATE} and {END_DATE}."))
     print(crayons.green(f"Data will be saved in {OUTPATH}."))
 
-    tick = time.time()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        main(date_range)
-    tock = time.time()
-    print(crayons.magenta(f"Process finished in {tock - tick:0.2}s."))
+        main(start, end)
+
