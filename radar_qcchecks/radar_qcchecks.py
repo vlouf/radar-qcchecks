@@ -146,7 +146,14 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     return statistics
 
 
-def qccheck_radar_odim(infile: str):
+def qccheck_radar_odim(
+    infile: str,
+    dbz_name: str = "DBZH",
+    zdr_name: str = "ZDR",
+    rhohv_name: str = "RHOHV",
+    phidp_name: str = "PHIDP",
+    kdp_name: str = "KDP",
+):
     """
     Quality control check of dual-polarization variables of ODIM h5 input file.
 
@@ -169,11 +176,11 @@ def qccheck_radar_odim(infile: str):
         radar[0] = radar[0].compute()
 
         # Load data
-        dbzh = radar[0].DBZH.values
-        zdr = radar[0].ZDR.values
-        rhohv = radar[0].RHOHV.values
-        phidp = radar[0].PHIDP.values
-        kdp = radar[0].KDP.values
+        dbzh = radar[0][dbz_name].values
+        zdr = radar[0][zdr_name].values
+        rhohv = radar[0][rhohv_name].values
+        phidp = radar[0][phidp_name].values
+        kdp = radar[0][kdp_name].values
 
         dtime = pd.Timestamp(radar[0].time[0].values)
 
