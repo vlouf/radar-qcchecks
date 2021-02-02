@@ -1,4 +1,5 @@
 import os
+import warnings
 import traceback
 
 import pyodim
@@ -104,38 +105,40 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
 
 
 def read_data(infile):
-    # Load radar
-    radar = pyodim.read_odim(infile, True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # Load radar
+        radar = pyodim.read_odim(infile, True)
 
-    # Read elevation
-    radar[0] = radar[0].compute()
+        # Read elevation
+        radar[0] = radar[0].compute()
 
-    # Load data
-    dbzh = radar[0].DBZH.values
-    zdr = radar[0].ZDR.values
-    rhohv = radar[0].RHOHV.values
-    phidp = radar[0].PHIDP.values
-    kdp = radar[0].KDP.values
+        # Load data
+        dbzh = radar[0].DBZH.values
+        zdr = radar[0].ZDR.values
+        rhohv = radar[0].RHOHV.values
+        phidp = radar[0].PHIDP.values
+        kdp = radar[0].KDP.values
 
-    dtime = pd.Timestamp(radar[0].time[0].values)
+        dtime = pd.Timestamp(radar[0].time[0].values)
 
-    # Offset to 0 phidp
-    phasemin = det_sys_phase(rhohv, phidp)
-    if np.isnan(phasemin):
-        phasemin = np.median(phidp[~np.isnan(dbzh)])
-    phidp = phidp - phasemin
+        # Offset to 0 phidp
+        phasemin = det_sys_phase(rhohv, phidp)
+        if np.isnan(phasemin):
+            phasemin = np.median(phidp[~np.isnan(dbzh)])
+        phidp = phidp - phasemin
 
-    pos_lowcut = (
-        ~np.isnan(dbzh) &
-        (dbzh >= 20) & (dbzh <= 28)
-    )
+        pos_lowcut = (
+            ~np.isnan(dbzh) &
+            (dbzh >= 20) & (dbzh <= 28)
+        )
 
-    if np.sum(pos_lowcut) < 100:
-        return None
-    if np.median(rhohv[pos_lowcut]) < 0.7:
-        return None
+        if np.sum(pos_lowcut) < 100:
+            return None
+        if np.median(rhohv[pos_lowcut]) < 0.7:
+            return None
 
-    lowstats = get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos_lowcut)
-    lowstats.update({"time": dtime})
+        lowstats = get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos_lowcut)
+        lowstats.update({"time": dtime})
 
     return lowstats
