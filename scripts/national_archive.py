@@ -17,21 +17,6 @@ import dask.bag as db
 import radar_qcchecks
 
 
-def _mkdir(dir: str):
-    """
-    Make directory.
-    """
-    if os.path.exists(dir):
-        return None
-
-    try:
-        os.mkdir(dir)
-    except FileExistsError:
-        pass
-
-    return None
-
-
 def check_rid() -> bool:
     """
     Check if the Radar ID provided exists.
