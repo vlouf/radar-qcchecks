@@ -131,6 +131,20 @@ def buffer(infile: str):
 
 
 def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
+    """
+    Driver for processing the quality control. Find the data for given radar ID
+    and dates on GADI. Unzip it and send it to the radar_qcchecks function. 
+    Also takes care of saving the output results into a daily csv file.
+
+    Parameters:
+    ===========
+    rid: int
+        Radar rapic ID.
+    date: pd.Timestamp
+        Date to process. 
+    outpath: str
+        Output path directory.
+    """
     fname = f"{rid}_stats_" + date.strftime("%Y%m%d") + ".csv"
     fname = os.path.join(outpath, fname)
     if os.path.isfile(fname):
@@ -183,13 +197,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=parser_description)
     parser.add_argument("-r", "--rid", dest="rid", type=int, required=True, help="Radar ID number.")
     parser.add_argument(
-        "-o", "--output", dest="output", default="/scratch/kl02/vhl548/qcchecks/", type=str, help="Output directory",
+        "-o", "--output", dest="output", default="/scratch/kl02/vhl548/qcchecks/", type=str, help="Output directory for csv files.",
     )
     parser.add_argument(
-        "-s", "--start-date", dest="start_date", default=None, type=str, help="Starting date.", required=True,
+        "-s", "--start-date", dest="start_date", default=None, type=str, help="Start date for radar processing.", required=True,
     )
     parser.add_argument(
-        "-e", "--end-date", dest="end_date", default=None, type=str, help="Ending date.", required=True,
+        "-e", "--end-date", dest="end_date", default=None, type=str, help="End date for radar processing.", required=True,
     )
 
     args = parser.parse_args()
