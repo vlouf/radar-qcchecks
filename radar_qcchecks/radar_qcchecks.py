@@ -1,15 +1,11 @@
-import os
 import warnings
-import traceback
 
 import pyodim
 import numpy as np
 import pandas as pd
-import dask
-import dask.bag as db
 
 
-def smooth_and_trim(x, window_len=11, window='hanning'):
+def smooth_and_trim(x, window_len: int = 11, window: str = 'hanning'):
     """
     Smooth data using a window with requested size.
     This method is based on the convolution of a scaled window with the signal.
@@ -56,7 +52,7 @@ def smooth_and_trim(x, window_len=11, window='hanning'):
     return y[int(window_len / 2):len(x) + int(window_len / 2)]
 
 
-def det_sys_phase(rhv, phidp, rhv_lev=0.6):
+def det_sys_phase(rhv, phidp, rhv_lev: float = 0.6):
     """ Determine the system phase, see :py:func:`det_sys_phase`. """
     good = False
     phases = []
@@ -73,6 +69,30 @@ def det_sys_phase(rhv, phidp, rhv_lev=0.6):
 
 
 def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
+    """
+    Perform Marks et al. (2011) series of statistics for dual-polarisation
+    quality checks.
+
+    Parameters:
+    ===========
+    dbzh: ndarray<azimuth, range>
+        Array of reflectivity (lowest elevation scan)
+    phidp: ndarray<azimuth, range>
+        Array of differential phase (lowest elevation scan)
+    zdr: ndarray<azimuth, range>
+        Array of differential reflectivity (lowest elevation scan)
+    rhohv: ndarray<azimuth, range>
+        Array of cross correlation ratio (lowest elevation scan)
+    kdp: ndarray<azimuth, range>
+        Array of specific differential phase (lowest elevation scan)
+    pos: ndarray<azimuth, range>
+        Mask for light rain filtering.
+
+    Returns:
+    ========
+    statistics: dict
+        DP quality checks statistics for given scan.
+    """
     def zdr_stats(zdrp):
         szdr = zdrp.std()
         aad = np.sum(np.abs(zdrp - zdrp.mean())) / len(zdrp)
@@ -104,7 +124,20 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     return statistics
 
 
-def read_data(infile):
+def qccheck_radar_odim(infile: str):
+    """
+    Quality control check of dual-polarization variables of ODIM h5 input file.
+
+    Parameters:
+    ===========
+    infile: str
+        Input radar file in ODIM H5 format.
+
+    Returns:
+    ========
+    lowstats: dict
+        Quality checks statistics in light rain for DP variables.
+    """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         # Load radar
