@@ -196,7 +196,7 @@ def qccheck_radar_odim(
             dbzh = radar[0][dbz_name].values
         zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
         rhohv = np.ma.masked_invalid(radar[0][rhohv_name].values).filled(0)
-        phidp = radar[0][phidp_name].values
+        phidp = np.ma.masked_invalid(radar[0][phidp_name].values)
         kdp = np.ma.masked_invalid(radar[0][kdp_name].values)
 
         dtime = pd.Timestamp(radar[0].time[0].values)
