@@ -116,8 +116,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     """
 
     def zdr_stats(zdrp):
-        szdr = zdrp.std()
-        aad = np.sum(np.abs(zdrp - zdrp.mean())) / len(zdrp)
+        szdr = np.nanstd(zdrp)
+        aad = np.sum(np.abs(zdrp - np.nanmean(zdrp))) / len(zdrp)
         return szdr, aad
 
     sigma_phi = np.zeros_like(phidp)
@@ -131,8 +131,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     statistics = {
         "N": pos.sum(),
         "ZH_med": np.median(dbzh[pos]),
-        "RHOHV_med": np.median(rhohv[pos]),
-        "RHOHV_std": np.std(rhohv[pos]),
+        "RHOHV_med": np.nanmedian(rhohv[pos]),
+        "RHOHV_std": np.nanstd(rhohv[pos]),
         "KDP_med": np.nanmedian(kdp[pos]),
         "KDP_std": np.nanstd(kdp[pos]),
         "ZDR_std": szdr,
@@ -186,7 +186,10 @@ def qccheck_radar_odim(
         radar[0] = radar[0].compute()
 
         # Load data
-        dbzh = radar[0][dbz_name].values
+        try:
+            dbzh = radar[0]["DBZH_CLEAN"].values
+        except KeyError:
+            dbzh = radar[0][dbz_name].values
         zdr = radar[0][zdr_name].values
         rhohv = radar[0][rhohv_name].values
         phidp = radar[0][phidp_name].values
@@ -200,7 +203,7 @@ def qccheck_radar_odim(
             phasemin = np.median(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
-        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28)
+        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7)
 
         if np.sum(pos_lowcut) < 100:
             return None
