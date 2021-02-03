@@ -188,9 +188,10 @@ def qccheck_radar_odim(
         # Read elevation
         radar[0] = radar[0].compute()
 
-        # Load data
+        # Load data        
         try:
             dbzh = radar[0]["DBZH_CLEAN"].values
+            dbzh[dbzh < 0] = np.NaN
         except KeyError:
             dbzh = radar[0][dbz_name].values
         zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
