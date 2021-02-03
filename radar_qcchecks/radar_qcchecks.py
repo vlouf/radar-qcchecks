@@ -116,8 +116,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     """
 
     def zdr_stats(zdrp):
-        szdr = np.nanstd(zdrp)
-        aad = np.sum(np.abs(zdrp - np.nanmean(zdrp))) / len(zdrp)
+        szdr = np.std(zdrp)
+        aad = np.sum(np.abs(zdrp - np.mean(zdrp))) / len(zdrp)
         return szdr, aad
 
     sigma_phi = np.zeros_like(phidp)
@@ -131,14 +131,14 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     statistics = {
         "N": pos.sum(),
         "ZH_med": np.median(dbzh[pos]),
-        "RHOHV_med": np.nanmedian(rhohv[pos]),
-        "RHOHV_std": np.nanstd(rhohv[pos]),
-        "KDP_med": np.nanmedian(kdp[pos]),
-        "KDP_std": np.nanstd(kdp[pos]),
+        "RHOHV_med": np.median(rhohv[pos]),
+        "RHOHV_std": np.std(rhohv[pos]),
+        "KDP_med": np.median(kdp[pos]),
+        "KDP_std": np.std(kdp[pos]),
         "ZDR_std": szdr,
         "ZDR_aad": aad,
-        "PHIDP_med": np.nanmedian(sigma_phi),
-        "PHIDP_std": np.nanstd(sigma_phi),
+        "PHIDP_med": np.median(sigma_phi),
+        "PHIDP_std": np.std(sigma_phi),
         "N_kdp_sample": (~np.isnan(sigma_phi)).sum(),
         "SIGMA_kdp": sig_kdp,
     }
@@ -190,10 +190,10 @@ def qccheck_radar_odim(
             dbzh = radar[0]["DBZH_CLEAN"].values
         except KeyError:
             dbzh = radar[0][dbz_name].values
-        zdr = radar[0][zdr_name].values
-        rhohv = radar[0][rhohv_name].values
-        phidp = radar[0][phidp_name].values
-        kdp = radar[0][kdp_name].values
+        zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
+        rhohv = np.ma.masked_invalid(radar[0][rhohv_name].values).filled(0)
+        phidp = np.ma.masked_invalid(radar[0][phidp_name].values)
+        kdp = np.ma.masked_invalid(radar[0][kdp_name].values)
 
         dtime = pd.Timestamp(radar[0].time[0].values)
 
@@ -206,8 +206,6 @@ def qccheck_radar_odim(
         pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7)
 
         if np.sum(pos_lowcut) < 100:
-            return None
-        if np.median(rhohv[pos_lowcut]) < 0.7:
             return None
 
         lowstats = get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos_lowcut)
