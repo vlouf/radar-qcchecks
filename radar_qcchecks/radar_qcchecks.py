@@ -20,6 +20,8 @@ https://doi.org/10.1175/2010JTECHA1462.1
     get_statistics
     qccheck_radar_odim
 """
+import os
+import contextlib
 import warnings
 
 import pyodim
@@ -197,9 +199,11 @@ def qccheck_radar_odim(
         Quality checks statistics in light rain for DP variables.
     """
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        # Load radar
-        radar = pyodim.read_odim(infile, True)
+        warnings.simplefilter("ignore")        
+        # This silences standard output from pyodim library
+        with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
+            # Load radar
+            radar = pyodim.read_odim(infile, True)
 
         # Read elevation
         radar[0] = radar[0].compute()

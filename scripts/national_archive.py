@@ -5,7 +5,7 @@ GADI driver script for the Quality control check of dual-polarization variables.
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 02/02/2021
+@date: 03/02/2021
 
 .. autosummary::
     :toctree: generated/
@@ -145,7 +145,8 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     outpath: str
         Output path directory.
     """
-    fname = f"{rid}_stats_" + date.strftime("%Y%m%d") + ".csv"
+    datestr =  date.strftime("%Y%m%d")
+    fname = f"{rid}_stats_{datestr}.csv"
     fname = os.path.join(outpath, fname)
     if os.path.isfile(fname):
         print("Output file already exists. Doing nothing.")
@@ -157,7 +158,7 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
         return None
 
     flist = extract_zip(inzip)
-
+    print(f"Found {len(flist)} files for radar {rid} on the {datestr}.")
     try:
         bag = db.from_sequence(flist).map(buffer)
         rslt = bag.compute()
