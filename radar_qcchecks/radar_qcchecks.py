@@ -140,9 +140,11 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "KDP_std": np.std(kdp[pos]),
         "ZDR_std": szdr,
         "ZDR_aad": aad,
-        "PHIDP_med": np.nanmedian(sigma_phi),
-        "PHIDP_std": np.nanstd(sigma_phi),
+        "PHIDP_med": np.nanmedian(phidp[pos]),
+        "PHIDP_std": np.nanstd(phidp[pos]),
         "N_kdp_sample": (~np.isnan(sigma_phi)).sum(),
+        "SIGMA_PHIDP_med": np.nanmedian(sigma_phi),
+        "SIGMA_PHIDP_std": np.nanstd(sigma_phi),        
         "SIGMA_kdp": sig_kdp,
     }
 
@@ -196,7 +198,7 @@ def qccheck_radar_odim(
             dbzh = radar[0][dbz_name].values
         zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
         rhohv = np.ma.masked_invalid(radar[0][rhohv_name].values).filled(0)
-        phidp = np.ma.masked_invalid(radar[0][phidp_name].values)
+        phidp = radar[0][phidp_name].values
         kdp = np.ma.masked_invalid(radar[0][kdp_name].values)
 
         dtime = pd.Timestamp(radar[0].time[0].values)
@@ -204,7 +206,7 @@ def qccheck_radar_odim(
         # Offset to 0 phidp
         phasemin = det_sys_phase(rhohv, phidp)
         if np.isnan(phasemin):
-            phasemin = np.median(phidp[~np.isnan(dbzh)])
+            phasemin = np.nanmedian(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
         pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7)
