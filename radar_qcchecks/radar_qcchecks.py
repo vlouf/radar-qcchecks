@@ -158,6 +158,10 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "SIGMA_kdp": sig_kdp,
     }
 
+    for k, v in statistics.items():
+        if type(v) == np.ma.core.MaskedConstant:
+            statistics[k] = np.NaN
+
     return statistics
 
 
