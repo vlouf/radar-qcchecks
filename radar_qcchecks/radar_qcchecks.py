@@ -127,7 +127,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
             sigma_phi[i, :] = pd.Series(np.ma.masked_where(~pos, phidp)[i, :]).rolling(wsize).std()
         except Exception:
             continue
-    sig_kdp = np.nanmedian(np.sqrt(3) * sigma_phi / (wsize ** 1.5 * 0.25))
+    sigma_phi = np.ma.masked_invalid(sigma_phi)
+    sig_kdp = np.median(np.sqrt(3) * sigma_phi / (wsize ** 1.5 * 0.25))
 
     szdr, aad = zdr_stats(zdr[pos])
 
@@ -143,8 +144,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "PHIDP_med": np.nanmedian(phidp[pos]),
         "PHIDP_std": np.nanstd(phidp[pos]),
         "N_kdp_sample": (~np.isnan(sigma_phi)).sum(),
-        "SIGMA_PHIDP_med": np.nanmedian(sigma_phi),
-        "SIGMA_PHIDP_std": np.nanstd(sigma_phi),        
+        "SIGMA_PHIDP_med": np.median(sigma_phi),
+        "SIGMA_PHIDP_std": np.std(sigma_phi),        
         "SIGMA_kdp": sig_kdp,
     }
 
