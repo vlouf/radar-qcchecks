@@ -120,11 +120,14 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         aad = np.sum(np.abs(zdrp - np.mean(zdrp))) / len(zdrp)
         return szdr, aad
 
+    wsize = 15  # Window size for avg phidp.
     sigma_phi = np.zeros_like(phidp)
     for i in range(phidp.shape[0]):
-        sigma_phi[i, :] = pd.Series(np.ma.masked_where(~pos, phidp)[i, :]).rolling(15).std()
-
-    sig_kdp = np.nanmedian(np.sqrt(3) * sigma_phi / (15 ** 1.5 * 0.25))
+        try:
+            sigma_phi[i, :] = pd.Series(np.ma.masked_where(~pos, phidp)[i, :]).rolling(wsize).std()
+        except Exception:
+            continue
+    sig_kdp = np.nanmedian(np.sqrt(3) * sigma_phi / (wsize ** 1.5 * 0.25))
 
     szdr, aad = zdr_stats(zdr[pos])
 
@@ -137,8 +140,8 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "KDP_std": np.std(kdp[pos]),
         "ZDR_std": szdr,
         "ZDR_aad": aad,
-        "PHIDP_med": np.median(sigma_phi),
-        "PHIDP_std": np.std(sigma_phi),
+        "PHIDP_med": np.nanmedian(sigma_phi),
+        "PHIDP_std": np.nanstd(sigma_phi),
         "N_kdp_sample": (~np.isnan(sigma_phi)).sum(),
         "SIGMA_kdp": sig_kdp,
     }
@@ -192,7 +195,7 @@ def qccheck_radar_odim(
             dbzh = radar[0][dbz_name].values
         zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
         rhohv = np.ma.masked_invalid(radar[0][rhohv_name].values).filled(0)
-        phidp = np.ma.masked_invalid(radar[0][phidp_name].values)
+        phidp = radar[0][phidp_name].values
         kdp = np.ma.masked_invalid(radar[0][kdp_name].values)
 
         dtime = pd.Timestamp(radar[0].time[0].values)
