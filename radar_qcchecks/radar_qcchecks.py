@@ -218,6 +218,9 @@ def qccheck_radar_odim(
         rhohv = np.ma.masked_invalid(radar[rhohv_name].values).filled(0)
         phidp = radar[phidp_name].values
         kdp = np.ma.masked_invalid(radar[kdp_name].values)
+        x = radar.x.values / 1000
+        y = radar.y.values / 1000
+        r = np.sqrt(x ** 2 + y ** 2)
 
         dtime = pd.Timestamp(radar.time[0].values)
 
@@ -227,7 +230,7 @@ def qccheck_radar_odim(
             phasemin = np.nanmedian(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
-        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7)
+        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7) & (r < 150)
 
         if np.sum(pos_lowcut) < 100:
             return None
