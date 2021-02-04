@@ -29,7 +29,6 @@ from typing import Dict
 
 import pyodim
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 
 
