@@ -15,6 +15,7 @@ https://doi.org/10.1175/2010JTECHA1462.1
 .. autosummary::
     :toctree: generated/
 
+    buffer
     smooth_and_trim
     det_sys_phase
     get_statistics
@@ -33,6 +34,9 @@ import pandas as pd
 
 
 def buffer(func):
+    """
+    Decorator to catch and kill error message.
+    """
     def wrapper(*args, **kwargs):
         try:
             rslt = func(*args, **kwargs)
