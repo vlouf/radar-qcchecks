@@ -21,6 +21,7 @@ https://doi.org/10.1175/2010JTECHA1462.1
     qccheck_radar_odim
 """
 import os
+import traceback
 import contextlib
 import warnings
 from typing import Dict
@@ -29,6 +30,17 @@ import pyodim
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+
+
+def buffer(func):
+    def wrapper(*args, **kwargs):
+        try:
+            rslt = func(*args, **kwargs)
+        except Exception:
+            traceback.print_exc()
+            rslt = None
+        return rslt
+    return wrapper
 
 
 def smooth_and_trim(x: np.ndarray, window_len: int = 11, window: str = "hanning") -> np.ndarray:
@@ -172,6 +184,7 @@ def get_statistics(
     return statistics
 
 
+@buffer
 def qccheck_radar_odim(
     infile: str,
     dbz_name: str = "DBZH",

@@ -14,7 +14,6 @@ GADI driver script for the Quality control check of dual-polarization variables.
     extract_zip
     get_radar_archive_file
     remove
-    buffer
     process_quality_control
     main
 """
@@ -30,9 +29,7 @@ import traceback
 from typing import Dict
 
 import crayons
-import numpy as np
 import pandas as pd
-import dask
 import dask.bag as db
 
 import radar_qcchecks
@@ -107,30 +104,6 @@ def remove(flist: list) -> None:
     return None
 
 
-def buffer(infile: str) -> Dict:
-    """
-    Buffer function to catch and kill errors about missing Sun hit.
-
-    Parameters:
-    ===========
-    infile: str
-        Input radar file.
-
-    Returns:
-    ========
-    rslt: Dict
-        Quality checks results from qccheck_radar_odim.
-    """
-    try:
-        rslt = radar_qcchecks.qccheck_radar_odim(infile)
-    except Exception:
-        print(f"Problem with file {infile}.")
-        traceback.print_exc()
-        return None
-
-    return rslt
-
-
 def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     """
     Driver for processing the quality control. Find the data for given radar ID
@@ -161,7 +134,7 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     flist = extract_zip(inzip)
     print(f"Found {len(flist)} files for radar {rid} on the {datestr}.")
     try:
-        bag = db.from_sequence(flist).map(buffer)
+        bag = db.from_sequence(flist).map(radar_qcchecks.qccheck_radar_odim)
         rslt = bag.compute()
 
         rslt = [r for r in rslt if r is not None]
