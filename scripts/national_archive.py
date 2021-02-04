@@ -5,7 +5,7 @@ GADI driver script for the Quality control check of dual-polarization variables.
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 03/02/2021
+@date: 04/02/2021
 
 .. autosummary::
     :toctree: generated/
@@ -27,6 +27,7 @@ import argparse
 import datetime
 import warnings
 import traceback
+from typing import Dict
 
 import crayons
 import numpy as np
@@ -106,7 +107,7 @@ def remove(flist: list) -> None:
     return None
 
 
-def buffer(infile: str):
+def buffer(infile: str) -> Dict:
     """
     Buffer function to catch and kill errors about missing Sun hit.
 
@@ -117,8 +118,8 @@ def buffer(infile: str):
 
     Returns:
     ========
-    rslt: pd.DataFrame
-        Pandas dataframe with the results from the solar calibration code.
+    rslt: Dict
+        Quality checks results from qccheck_radar_odim.
     """
     try:
         rslt = radar_qcchecks.qccheck_radar_odim(infile)
@@ -133,7 +134,7 @@ def buffer(infile: str):
 def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     """
     Driver for processing the quality control. Find the data for given radar ID
-    and dates on GADI. Unzip it and send it to the radar_qcchecks function. 
+    and dates on GADI. Unzip it and send it to the radar_qcchecks function.
     Also takes care of saving the output results into a daily csv file.
 
     Parameters:
@@ -141,11 +142,11 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     rid: int
         Radar rapic ID.
     date: pd.Timestamp
-        Date to process. 
+        Date to process.
     outpath: str
         Output path directory.
     """
-    datestr =  date.strftime("%Y%m%d")
+    datestr = date.strftime("%Y%m%d")
     fname = f"{rid}_stats_{datestr}.csv"
     fname = os.path.join(outpath, fname)
     if os.path.isfile(fname):
@@ -182,7 +183,7 @@ def process_quality_control(rid: int, date: pd.Timestamp, outpath: str) -> None:
     return None
 
 
-def main(start_date, end_date) -> None:
+def main(start_date: datetime.datetime, end_date: datetime.datetime) -> None:
     tick = time.time()
     date_range = pd.date_range(start_date, end_date)
     for date in date_range:
