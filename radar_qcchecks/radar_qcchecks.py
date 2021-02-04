@@ -174,6 +174,7 @@ def qccheck_radar_odim(
     rhohv_name: str = "RHOHV",
     phidp_name: str = "PHIDP",
     kdp_name: str = "KDP",
+    nsweep: int = 0,
 ):
     """
     Quality control check of dual-polarization variables of ODIM h5 input file.
@@ -192,6 +193,8 @@ def qccheck_radar_odim(
         PHIDP field name.
     kdp_name: str
         KDP field name.
+    nsweep: int
+        Radar sweep number (pyodim reoder sweep by increasing elevation)
 
     Returns:
     ========
@@ -206,12 +209,11 @@ def qccheck_radar_odim(
             nradar = pyodim.read_odim(infile, True)
 
         # Read elevation
-        radar = nradar[0].compute()
+        radar = nradar[nsweep].compute()
 
         # Load data
         try:
             dbzh = radar["DBZH_CLEAN"].values
-            dbzh[dbzh < 0] = np.NaN
         except KeyError:
             dbzh = radar[dbz_name].values
         zdr = np.ma.masked_invalid(radar[zdr_name].values)
