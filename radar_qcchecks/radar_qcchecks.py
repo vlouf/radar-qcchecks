@@ -23,13 +23,15 @@ https://doi.org/10.1175/2010JTECHA1462.1
 import os
 import contextlib
 import warnings
+from typing import Dict
 
 import pyodim
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 
 
-def smooth_and_trim(x, window_len: int = 11, window: str = "hanning"):
+def smooth_and_trim(x: np.ndarray, window_len: int = 11, window: str = "hanning") -> np.ndarray:
     """
     Smooth data using a window with requested size.
     This method is based on the convolution of a scaled window with the signal.
@@ -75,7 +77,7 @@ def smooth_and_trim(x, window_len: int = 11, window: str = "hanning"):
     return y[int(window_len / 2) : len(x) + int(window_len / 2)]
 
 
-def det_sys_phase(rhv, phidp, rhv_lev: float = 0.6):
+def det_sys_phase(rhv: np.ndarray, phidp: np.ndarray, rhv_lev: float = 0.6) -> float:
     """ Determine the system phase, see :py:func:`det_sys_phase`. """
     good = False
     phases = []
@@ -91,7 +93,9 @@ def det_sys_phase(rhv, phidp, rhv_lev: float = 0.6):
     return np.median(phases)
 
 
-def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
+def get_statistics(
+    dbzh: np.ndarray, phidp: np.ndarray, zdr: np.ndarray, rhohv: np.ndarray, kdp: np.ndarray, pos: np.ndarray,
+) -> Dict:
     """
     Perform Marks et al. (2011) series of statistics for dual-polarisation
     quality checks.
@@ -116,6 +120,7 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
     statistics: dict
         DP quality checks statistics for given scan.
     """
+
     def zdr_stats(zdrp):
         szdr = np.std(zdrp)
         aad = np.sum(np.abs(zdrp - np.mean(zdrp))) / len(zdrp)
@@ -175,7 +180,7 @@ def qccheck_radar_odim(
     phidp_name: str = "PHIDP",
     kdp_name: str = "KDP",
     nsweep: int = 0,
-):
+) -> Dict:
     """
     Quality control check of dual-polarization variables of ODIM h5 input file.
 
