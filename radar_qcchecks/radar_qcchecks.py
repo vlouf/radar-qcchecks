@@ -10,7 +10,7 @@ https://doi.org/10.1175/2010JTECHA1462.1
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 03/02/2021
+@date: 04/02/2021
 
 .. autosummary::
     :toctree: generated/
@@ -156,7 +156,7 @@ def get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos):
         "PHIDP_std": np.nanstd(phidp[pos]),
         "N_kdp_sample": nsample_kdp,
         "SIGMA_PHIDP_med": sig_phi_med,
-        "SIGMA_PHIDP_std": sig_phi_std,        
+        "SIGMA_PHIDP_std": sig_phi_std,
         "SIGMA_kdp": sig_kdp,
     }
 
@@ -199,27 +199,27 @@ def qccheck_radar_odim(
         Quality checks statistics in light rain for DP variables.
     """
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")        
+        warnings.simplefilter("ignore")
         # This silences standard output from pyodim library
         with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
             # Load radar
-            radar = pyodim.read_odim(infile, True)
+            nradar = pyodim.read_odim(infile, True)
 
         # Read elevation
-        radar[0] = radar[0].compute()
+        radar = nradar[0].compute()
 
-        # Load data        
+        # Load data
         try:
-            dbzh = radar[0]["DBZH_CLEAN"].values
+            dbzh = radar["DBZH_CLEAN"].values
             dbzh[dbzh < 0] = np.NaN
         except KeyError:
-            dbzh = radar[0][dbz_name].values
-        zdr = np.ma.masked_invalid(radar[0][zdr_name].values)
-        rhohv = np.ma.masked_invalid(radar[0][rhohv_name].values).filled(0)
-        phidp = radar[0][phidp_name].values
-        kdp = np.ma.masked_invalid(radar[0][kdp_name].values)
+            dbzh = radar[dbz_name].values
+        zdr = np.ma.masked_invalid(radar[zdr_name].values)
+        rhohv = np.ma.masked_invalid(radar[rhohv_name].values).filled(0)
+        phidp = radar[phidp_name].values
+        kdp = np.ma.masked_invalid(radar[kdp_name].values)
 
-        dtime = pd.Timestamp(radar[0].time[0].values)
+        dtime = pd.Timestamp(radar.time[0].values)
 
         # Offset to 0 phidp
         phasemin = det_sys_phase(rhohv, phidp)
