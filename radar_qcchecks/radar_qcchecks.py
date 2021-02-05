@@ -36,6 +36,7 @@ def buffer(func):
     """
     Decorator to catch and kill error message.
     """
+
     def wrapper(*args, **kwargs):
         try:
             rslt = func(*args, **kwargs)
@@ -43,6 +44,7 @@ def buffer(func):
             traceback.print_exc()
             rslt = None
         return rslt
+
     return wrapper
 
 
@@ -253,7 +255,18 @@ def qccheck_radar_odim(
             phasemin = np.nanmedian(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
-        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.8) & (r < 150) & (r >= 20) & (kdp > -2) & (kdp < 3) & (zdr < 2.5) & (zdr > -1)
+        pos_lowcut = (
+            ~np.isnan(dbzh)
+            & (dbzh >= 20)
+            & (dbzh <= 28)
+            & (rhohv > 0.8)
+            & (r < 150)
+            & (r >= 20)
+            & (kdp > -2)
+            & (kdp < 3)
+            & (zdr < 2.5)
+            & (zdr > -1)
+        )
 
         if np.sum(pos_lowcut) < 100:
             return None
