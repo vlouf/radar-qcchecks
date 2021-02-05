@@ -10,7 +10,7 @@ https://doi.org/10.1175/2010JTECHA1462.1
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 04/02/2021
+@date: 05/02/2021
 
 .. autosummary::
     :toctree: generated/
@@ -253,7 +253,7 @@ def qccheck_radar_odim(
             phasemin = np.nanmedian(phidp[~np.isnan(dbzh)])
         phidp = phidp - phasemin
 
-        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.7) & (r < 150)
+        pos_lowcut = ~np.isnan(dbzh) & (dbzh >= 20) & (dbzh <= 28) & (rhohv > 0.8) & (r < 150) & (r >= 20) & (kdp > -2) & (kdp < 3) & (zdr < 2.5) & (zdr > -1)
 
         if np.sum(pos_lowcut) < 100:
             return None
