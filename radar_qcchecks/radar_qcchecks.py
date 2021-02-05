@@ -269,7 +269,7 @@ def qccheck_radar_odim(
         )
 
         if np.sum(pos_lowcut) < 100:
-            return None
+            raise ValueError(f"No stratiform rain detected in {infile}.")
 
         lowstats = get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos_lowcut)
         lowstats.update({"time": dtime})
