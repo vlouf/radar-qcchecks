@@ -130,3 +130,10 @@ dmypy.json
 
 # VS code
 .vscode/
+
+# PBS files
+*.pbs
+*.pbs.*
+
+# Notebooks
+notebook/
