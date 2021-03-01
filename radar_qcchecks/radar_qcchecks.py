@@ -37,22 +37,6 @@ class NoRainError(Exception):
     pass
 
 
-def buffer(func):
-    """
-    Decorator to catch and kill error message.
-    """
-
-    def wrapper(*args, **kwargs):
-        try:
-            rslt = func(*args, **kwargs)
-        except Exception:
-            traceback.print_exc()
-            rslt = None
-        return rslt
-
-    return wrapper
-
-
 def smooth_and_trim(x: np.ndarray, window_len: int = 11, window: str = "hanning") -> np.ndarray:
     """
     Smooth data using a window with requested size.
@@ -194,7 +178,6 @@ def get_statistics(
     return statistics
 
 
-@buffer
 def qccheck_radar_odim(
     infile: str,
     dbz_name: str = "DBZH",
@@ -274,7 +257,7 @@ def qccheck_radar_odim(
         )
 
         if np.sum(pos_lowcut) < 100:
-            raise ValueError(f"No stratiform rain detected in {infile}.")
+            raise NoRainError(f"No stratiform rain detected in {infile}.")
 
         lowstats = get_statistics(dbzh, phidp, zdr, rhohv, kdp, pos_lowcut)
         lowstats.update({"time": dtime})
