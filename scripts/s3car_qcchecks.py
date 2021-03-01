@@ -90,12 +90,12 @@ def check_field(infile: str, field_name: str = "RHOHV") -> bool:
         True/False presence of the given field.
     """
     with netCDF4.Dataset(infile) as ncid:
-        groups = ncid['/dataset1'].groups.keys()
+        groups = ncid["/dataset1"].groups.keys()
         var = []
         for group in groups:
             if "data" not in group:
                 continue
-            name = ncid[f'/dataset1/{group}/what'].getncattr('quantity')
+            name = ncid[f"/dataset1/{group}/what"].getncattr("quantity")
             var.append(name)
 
     if field_name in var:
@@ -173,7 +173,17 @@ def mkdir(path: str) -> None:
     return None
 
 
-def main():
+def main() -> None:
+    """
+    Structure (looping over radar ID in configuration file):
+
+    1/ Check if input exists for given radar ID and date.
+    2/ Check if files contain the dual-pol variables (RHOHV).
+    2/ Create output directories (if does not exists)
+    3/ Check if ouput exists (doing nothing if it does).
+    4/ Processing radar-qcchecks
+    5/ Saving output data as a CSV file using pandas.
+    """
     radar_infoset = pd.read_csv(CONFIG_FILE)
     for n in range(len(radar_infoset)):
         rid = radar_infoset.id[n]
@@ -233,12 +243,7 @@ if __name__ == "__main__":
     parser_description = "Radar quality checks."
     parser = argparse.ArgumentParser(description=parser_description)
     parser.add_argument(
-        "-d",
-        "--date",
-        dest="date",
-        type=str,
-        help="Value to be converted to Timestamp (str).",
-        required=True,
+        "-d", "--date", dest="date", type=str, help="Value to be converted to Timestamp (str).", required=True,
     )
     parser.add_argument(
         "-o",
