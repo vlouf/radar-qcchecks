@@ -10,11 +10,12 @@ https://doi.org/10.1175/2010JTECHA1462.1
 @author: Valentin Louf <valentin.louf@bom.gov.au>
 @institutions: Bureau of Meteorology
 @creation: 02/02/2021
-@date: 05/02/2021
+@date: 01/03/2021
 
 .. autosummary::
     :toctree: generated/
 
+    NoRainError
     buffer
     smooth_and_trim
     det_sys_phase
@@ -30,6 +31,10 @@ from typing import Dict
 import pyodim
 import numpy as np
 import pandas as pd
+
+
+class NoRainError(Exception):
+    pass
 
 
 def buffer(func):
