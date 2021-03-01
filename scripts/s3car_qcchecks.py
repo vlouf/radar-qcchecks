@@ -10,6 +10,7 @@ import netCDF4
 import pandas as pd
 import dask.bag as db
 import radar_qcchecks
+from radar_qcchecks import NoRainError
 
 
 def buffer(func):
@@ -96,6 +97,8 @@ def driver(infile: str) -> Any:
     """
     try:
         rslt = radar_qcchecks.qccheck_radar_odim(infile, **FIELD_NAMES)
+    except NoRainError:
+        return None
     except Exception:
         print(f"Problem with file {infile}.")
         traceback.print_exc()
@@ -152,16 +155,6 @@ def main():
     for n in range(len(radar_infoset)):
         rid = radar_infoset.id[n]
 
-        # Create output directories and check if output file exists
-        outdir = os.path.join(OUTPUT_DATA_PATH, "qcdualpol")
-        mkdir(outdir)
-        outdir = os.path.join(outdir, rid)
-        mkdir(outdir)
-        output_filename = os.path.join(outdir, f"{rid}_{DATE}.csv")
-        if os.path.exists(output_filename):
-            print(f"Output file already exists for {rid} at {DATE}. Doing nothing.")
-            continue
-
         # Get radar files for given date and RID.
         radar_flist = get_ground_radar_file(DTIME, rid)
         if radar_flist is None:
@@ -174,7 +167,17 @@ def main():
             print(f"The dual-polarization fields are not present for radar {rid}.")
             continue
         flist = [f for f, g in zip(radar_flist, dualpol_files) if g is True]
-        print(f"Found {len(flist)} files with the uncorrected reflectivity for radar {rid} for date {DATE}.")
+        print(f"Found {len(flist)} files with the dual-polarization fields for radar {rid} for date {DATE}.")
+
+        # Create output directories and check if output file exists
+        outdir = os.path.join(OUTPUT_DATA_PATH, "dualpol_qc")
+        mkdir(outdir)
+        outdir = os.path.join(outdir, str(rid))
+        mkdir(outdir)
+        output_filename = os.path.join(outdir, f"{rid}_{DATE}.csv")
+        if os.path.exists(output_filename):
+            print(f"Output file already exists for {rid} at {DATE}. Doing nothing.")
+            continue
 
         # Processing files.
         bag = db.from_sequence(flist).map(driver)
@@ -224,7 +227,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    RID = args.rid
     DATE = args.date
     OUTPUT_DATA_PATH = args.output
     try:
