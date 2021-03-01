@@ -1,15 +1,38 @@
+"""
+Quality control of Dual-Pol moments for radar data.
+
+@creator: Valentin Louf <valentin.louf@bom.gov.au>
+@project: s3car-server
+@institution: Bureau of Meteorology
+@date: 01/03/2021
+
+.. autosummary::
+    :toctree: generated/
+
+    buffer
+    check_file
+    check_field
+    driver
+    get_ground_radar_file
+    mkdir
+    main
+"""
+# Python Standard Library
 import os
 import sys
 import glob
 import argparse
 import warnings
 import traceback
+
 from typing import Any, Dict, List
 
+# Other libraries.
 import netCDF4
 import pandas as pd
 import dask.bag as db
 import radar_qcchecks
+
 from radar_qcchecks import NoRainError
 
 
